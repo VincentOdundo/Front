@@ -7,7 +7,8 @@ const recommendationRoutes = require("./routes/recommendations");
 const nairobellApp = express();
 
 mongoose
-  .connect("mongodb://localhost:27017", {
+  .connect("mongodb://localhost:27017/yourDatabaseName", {
+    //replace "yourDatabaseName" with the actual name of your database.
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -22,8 +23,8 @@ nairobellApp.get("/", (req, res) => {
   res.send("Welcome to NairoBell!");
 });
 
-nairobellApp.listen(3000, () => {
+const server = nairobellApp.listen(3000, () => {
   console.log("NairoBell server is running on port 3000");
 });
 
-module.exports = nairobellApp;
+module.exports = { server, nairobellApp };
