@@ -54,6 +54,11 @@ router.get("/category/:category", async (req, res) => {
   try {
     const category = req.params.category;
     const newsItems = await News.find({ category: category });
+
+    if (!newsItems) {
+      return res.status(404).send("No news items found for this category");
+    }
+
     res.json(newsItems);
   } catch (error) {
     console.error(error);

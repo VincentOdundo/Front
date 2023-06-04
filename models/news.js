@@ -21,7 +21,6 @@ const NewsSchema = new mongoose.Schema({
       required: true,
     },
   ],
-  // Add any other fields you need for your news articles
 });
 
 module.exports = mongoose.model("News", NewsSchema);

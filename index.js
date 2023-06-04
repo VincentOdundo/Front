@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const newsRoutes = require("./routes/news");
@@ -7,15 +8,18 @@ const recommendationRoutes = require("./routes/recommendations");
 const nairobellApp = express();
 
 mongoose
-  .connect(
-    "mongodb+srv://odundo:mawembe2030@nairobell.ds6lvl5.mongodb.net/?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Could not connect to MongoDB", err));
+  .catch((err) => {
+    console.error("Could not connect to MongoDB", err);
+    process.exit(1);
+  });
+
+nairobellApp.use(express.json()); // Handle JSON payloads
+nairobellApp.use(express.urlencoded({ extended: false })); // Handle form payloads
 
 nairobellApp.use("/news", newsRoutes);
 nairobellApp.use("/users", userRoutes);
@@ -23,6 +27,11 @@ nairobellApp.use("/recommendations", recommendationRoutes);
 
 nairobellApp.get("/", (req, res) => {
   res.send("Welcome to NairoBell!");
+});
+
+nairobellApp.use((req, res) => {
+  // Catch 404 errors
+  res.status(404).send("Sorry, we couldn't find that!");
 });
 
 const server = nairobellApp.listen(3001, () => {

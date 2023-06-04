@@ -16,7 +16,6 @@ const UserSchema = new mongoose.Schema({
       ref: "News",
     },
   ],
-  // Add any other fields you need for your users
 });
 
 module.exports = mongoose.model("User", UserSchema);

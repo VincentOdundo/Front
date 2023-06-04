@@ -1,44 +1,35 @@
-const mongoose = require("mongoose");
-const News = require("./routes/news");
-// Positive test case for creating a news article
-test("create a news article", async () => {
-  const news = new News({
-    title: "Test News",
-    link: "https://testnews.com",
-    imgUrl: "https://testnews.com/image.jpg",
-    pubDate: new Date(),
-    publisherLogo: "https://testnews.com/logo.jpg",
-    category: ["test"],
+const assert = require("assert");
+const request = require("supertest");
+const { nairobellApp } = require("../Front/index");
+describe("News Route", () => {
+  it("should return all news articles", (done) => {
+    request(nairobellApp)
+      .get("/news")
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.strictEqual(res.body.length, 10);
+        done();
+      });
   });
-  const savedNews = await news.save();
-  expect(savedNews._id).toBeDefined();
-});
-// Negative test case for creating a news article with missing required fields
-test("create a news article with missing required fields", async () => {
-  const news = new News({
-    imgUrl: "https://testnews.com/image.jpg",
-    pubDate: new Date(),
-    publisherLogo: "https://testnews.com/logo.jpg",
-    category: ["test"],
+  it("should return a single news article", (done) => {
+    request(nairobellApp)
+      .get("/news/1")
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.strictEqual(res.body.title, "Breaking News");
+        done();
+      });
   });
-  await expect(news.save()).rejects.toThrow();
-});
-// Positive test case for finding a news article
-test("find a news article", async () => {
-  const news = new News({
-    title: "Test News",
-    link: "https://testnews.com",
-    imgUrl: "https://testnews.com/image.jpg",
-    pubDate: new Date(),
-    publisherLogo: "https://testnews.com/logo.jpg",
-    category: ["test"],
+  it("should return 404 error for invalid news ID", (done) => {
+    request(nairobellApp)
+      .get("/news/100")
+      .expect(404)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.strictEqual(res.body.message, "News article not found");
+        done();
+      });
   });
-  await news.save();
-  const foundNews = await News.findOne({ title: "Test News" });
-  expect(foundNews).toBeDefined();
-});
-// Negative test case for finding a non-existent news article
-test("find a non-existent news article", async () => {
-  const foundNews = await News.findOne({ title: "Non-existent News" });
-  expect(foundNews).toBeNull();
 });
